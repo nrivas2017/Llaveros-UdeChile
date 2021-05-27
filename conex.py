@@ -216,6 +216,17 @@ def insertVenta(datos,con = sql_connection()):
     except Error:
         return 0,Error
 
+def eliminaVenta(id_venta,con = sql_connection()):
+    try:
+        cursorObj = con.cursor()
+        cursorObj.execute("""DELETE FROM detalle where id_venta = %s"""%id_venta)
+        con.commit()
+        cursorObj.execute("""DELETE FROM venta where id_venta = %s"""%id_venta)
+        con.commit()
+        cursorObj.close()
+        return 1,1
+    except Error:
+        return 0,Error
 def insertarLlavero(datos,con = sql_connection()):
     try:
         cursorObj = con.cursor()

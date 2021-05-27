@@ -68,6 +68,8 @@ class mywindow(QMainWindow):
         self.ui.tableHistorial.setSelectionBehavior(QTableView.SelectRows)
         self.ui.tableHistorial.doubleClicked.connect(self.clickRowHistorial) 
 
+        self.ui.btnEliminarVenta.clicked.connect(self.eliminarVenta)
+        self.ui.checkBoxConfirmarEliminarVenta.stateChanged.connect(lambda: self.checkBoxChange(self.ui.checkBoxConfirmarEliminarVenta,self.ui.btnEliminarVenta))
         #################### Pagina Stock #########################
         self.ui.btn_aceptarActualizaStock.clicked.connect(self.aceptarActualizaLlavero)
         self.ui.checkBox_confirmarActualizaStock.stateChanged.connect(lambda: self.checkBoxChange(self.ui.checkBox_confirmarActualizaStock,self.ui.btn_aceptarActualizaStock))
@@ -143,6 +145,7 @@ class mywindow(QMainWindow):
         self.ui.comboBoxLlaveroStock = []
         self.ui.spinBoxCantidad = []
         self.ui.btnDetalle = []  
+        self.ui.idVentaEliminar = ""
 
         self.selectHome()
        
@@ -665,9 +668,33 @@ class mywindow(QMainWindow):
             header_item = QTableWidgetItem(str(data[i]["id_venta"]))
             self.ui.tableHistorial.setVerticalHeaderItem(rowPosition, header_item)
 
+    def eliminarVenta(self):
+        if self.ui.idVentaEliminar == "":
+            QMessageBox.information(self, 'Error', 'Ninguna venta seleccionada')
+            return
+        else:
+            res = eliminaVenta(self.ui.idVentaEliminar)
+            if res[0] == 0:
+                self.dbError("Ha ocurrido un error al hacer una peticion en la BD")
+                return
+            else:
+                res = res[1]   
+            QMessageBox.information(self, 'Venta Eliminada', 'Se ha eliminado la venta')
+            self.ui.idVentaEliminar = ""            
+            self.ui.checkBoxConfirmarEliminarVenta.setChecked(False)
+            while self.ui.tableHistorialVentaSeleccionada.rowCount() > 0:
+                rowTotalAntes = self.ui.tableHistorialVentaSeleccionada.rowCount() - 1
+                self.ui.tableHistorialVentaSeleccionada.removeRow(rowTotalAntes)
+            while self.ui.tableHistorialDetalleVentaSeleccionada.rowCount() > 0:
+                rowTotalAntes = self.ui.tableHistorialDetalleVentaSeleccionada.rowCount() - 1
+                self.ui.tableHistorialDetalleVentaSeleccionada.removeRow(rowTotalAntes)
+            self.cambioHistorial()
+
     def clickRowHistorial(self, index):
         row = index.row()
         id_venta = self.ui.tableHistorial.verticalHeaderItem(row).text()
+
+        self.ui.idVentaEliminar = id_venta
 
         data = selectDetalleWhereID(id_venta)
         if data[0] == 0:
