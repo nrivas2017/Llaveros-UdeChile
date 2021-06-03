@@ -73,7 +73,7 @@ def selectVentas(mes,nombre,rut,con = sql_connection()):
 def selectDineroTotalMes(mes,con = sql_connection()):
     try:
         cursorObj = con.cursor()
-        cursorObj.execute("""SELECT sum(total) as total_mes from venta WHERE fecha LIKE '%-"""+mes+"""-%'""")
+        cursorObj.execute("""SELECT sum(total) as total_mes from venta WHERE fecha LIKE '%"""+mes+"""%'""")
         
         respuesta = cursorObj.fetchall()
 
@@ -90,7 +90,7 @@ def selectDineroTotalMes(mes,con = sql_connection()):
 def selectCantidadTotalMes(mes,con = sql_connection()):
     try:
         cursorObj = con.cursor()
-        cursorObj.execute("""SELECT sum(de.cantidad) as cantidad_total FROM venta as ve INNER JOIN detalle as de WHERE ve.id_venta = de.id_venta AND ve.fecha LIKE '%-"""+mes+"""-%'""")
+        cursorObj.execute("""SELECT sum(de.cantidad) as cantidad_total FROM venta as ve INNER JOIN detalle as de WHERE ve.id_venta = de.id_venta AND ve.fecha LIKE '%"""+mes+"""%'""")
         
         respuesta = cursorObj.fetchall()
 
@@ -246,5 +246,3 @@ def actualizarLlavero(datos,con = sql_connection()):
         return 1,1
     except Error:
         return 0,Error 
-
-

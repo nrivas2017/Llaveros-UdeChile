@@ -93,10 +93,8 @@ class mywindow(QMainWindow):
         ####### Tabla Stock Home
         self.ui.tableStockHome.setColumnWidth(0,420)
         self.ui.tableStockHome.setColumnWidth(1,170)
-
         ####### Tabla Cantidad Mensual Home
         self.ui.tableCantidadMensual.setColumnWidth(0,250)
-
         ####### Tabla Total Mensual Home
         self.ui.tableTotalMensual.setColumnWidth(0,250)
         
@@ -122,6 +120,22 @@ class mywindow(QMainWindow):
         self.ui.tableHistorial.setColumnWidth(2,85)
         self.ui.tableHistorial.setColumnWidth(3,80)
         self.ui.tableHistorial.setColumnWidth(4,70)
+        ####### Tabla Cantidad Mensual Historial
+        self.ui.tableCantidadMensual_Historial.setColumnWidth(0,250)
+        ####### Tabla Total Mensual Historial
+        self.ui.tableTotalMensual_Historial.setColumnWidth(0,250)
+        ####### Tabla Historial datos venta
+        self.ui.tableHistorialVentaSeleccionada.setColumnWidth(0,150)
+        self.ui.tableHistorialVentaSeleccionada.setColumnWidth(1,200)
+        self.ui.tableHistorialVentaSeleccionada.setColumnWidth(2,150)
+        self.ui.tableHistorialVentaSeleccionada.setColumnWidth(3,250)
+        self.ui.tableHistorialVentaSeleccionada.setColumnWidth(4,150)
+        self.ui.tableHistorialVentaSeleccionada.setColumnWidth(5,150)
+        ####### Tabla Historial detalle venta
+        self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(0,150)
+        self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(1,200)
+        self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(2,150)
+        self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(3,250)
 
         ######### Tabla Stock select
         self.ui.tableStock.setColumnWidth(0,200)
@@ -159,6 +173,7 @@ class mywindow(QMainWindow):
         else:
             mes = "-"+mes+"-"
         self.selectHistorial(mes,nombre,rut)
+
     def filtroNombreHistorial(self):
         nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
         rut = str(self.ui.lineEditFiltroRutHistorial.text())
@@ -191,10 +206,17 @@ class mywindow(QMainWindow):
         fecha = str(today.day)+"-"+str(today.month)+"-"+str(today.year)
         self.ui.tableCliente.setItem(0 , 0, QTableWidgetItem(fecha))
     def cambioHistorial(self):
+
+        
+        today = date.today()
+        mesActual = str(today.month)
+        self.ui.comboBoxFiltroMes.setCurrentIndex(int(mesActual))
+
         self.ui.stackedWidget.setCurrentWidget(self.ui.historial_page) #Carga pagina
         nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
         rut = str(self.ui.lineEditFiltroRutHistorial.text())
         mes = str(self.ui.comboBoxFiltroMes.currentText())
+
         if mes == "Todos":
             mes = ""
         else:
@@ -485,8 +507,8 @@ class mywindow(QMainWindow):
         yearActual = str(today.year)
 
         data = selectLlaveros()
-        dineroMes = selectDineroTotalMes(mesActual)
-        cantidadMes = selectCantidadTotalMes(mesActual)
+        dineroMes = selectDineroTotalMes("-" + mesActual + "-")
+        cantidadMes = selectCantidadTotalMes("-" + mesActual + "-")
 
         if data[0] == 0 or dineroMes[0] == 0 or cantidadMes[0] == 0:
             self.dbError("Ha ocurrido un error al hacer una peticion en la BD")
@@ -646,13 +668,19 @@ class mywindow(QMainWindow):
         self.ui.tableActualizaStock.setItem(row , 1, QTableWidgetItem(str(data[i]["precio"])))
 
     def selectHistorial(self,mes,nombre,rut):
+
+        dineroMes = selectDineroTotalMes(mes)
+        cantidadMes = selectCantidadTotalMes(mes)            
         
         data = selectVentas(mes,nombre,rut)
-        if data[0] == 0:
+        if data[0] == 0 or dineroMes[0] == 0 or cantidadMes[0] == 0:
             self.dbError("Ha ocurrido un error al hacer una peticion en la BD")
             return
         else:
             data = data[1]
+            dineroMes = dineroMes[1]
+            cantidadMes = cantidadMes[1]
+
         while self.ui.tableHistorial.rowCount() > 0:
             rowTotalAntes = self.ui.tableHistorial.rowCount() - 1
             self.ui.tableHistorial.removeRow(rowTotalAntes)
@@ -667,6 +695,22 @@ class mywindow(QMainWindow):
 
             header_item = QTableWidgetItem(str(data[i]["id_venta"]))
             self.ui.tableHistorial.setVerticalHeaderItem(rowPosition, header_item)
+
+        font = QFont("MS Shell Dlg 2", 11)
+        font.setBold(True)
+
+        if dineroMes[0]["total"] == None:
+            item_1 = QTableWidgetItem("$ 0")
+            item_2 = QTableWidgetItem("0")
+        else:
+            item_1 = QTableWidgetItem("$ "+str(dineroMes[0]["total"]))
+            item_2 = QTableWidgetItem(str(cantidadMes[0]["total"]))
+        item_1.setFont(font)
+        item_2.setFont(font)
+        item_1.setTextAlignment(Qt.AlignCenter)
+        item_2.setTextAlignment(Qt.AlignCenter)
+        self.ui.tableTotalMensual_Historial.setItem(0 , 0, item_1)
+        self.ui.tableCantidadMensual_Historial.setItem(0 , 0, item_2)
 
     def eliminarVenta(self):
         if self.ui.idVentaEliminar == "":
