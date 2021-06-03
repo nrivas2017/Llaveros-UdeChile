@@ -15,7 +15,7 @@ def sql_connection():
 def selectLlaveros(con = sql_connection()):
     try:
         cursorObj = con.cursor()
-        cursorObj.execute("""SELECT id_llavero,nombre,precio,stock FROM llaveros""")
+        cursorObj.execute("""SELECT id_llavero,nombre,precio,stock FROM llaveros ORDER BY nombre""")
         
         respuesta = cursorObj.fetchall()
 
