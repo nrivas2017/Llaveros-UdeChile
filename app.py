@@ -110,7 +110,7 @@ class mywindow(QMainWindow):
         self.ui.comboBox_Cliente.addItem("Envío")
         self.ui.tableCliente.setCellWidget(0, 5, self.ui.comboBox_Cliente)
         ####### Tabla Venta Detalle
-        self.ui.tableDetalle.setColumnWidth(0,160)
+        self.ui.tableDetalle.setColumnWidth(0,220)
         self.ui.tableDetalle.setColumnWidth(1,120)
         self.ui.tableDetalle.setColumnWidth(2,160)       
 
@@ -132,7 +132,7 @@ class mywindow(QMainWindow):
         self.ui.tableHistorialVentaSeleccionada.setColumnWidth(4,150)
         self.ui.tableHistorialVentaSeleccionada.setColumnWidth(5,150)
         ####### Tabla Historial detalle venta
-        self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(0,150)
+        self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(0,220)
         self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(1,200)
         self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(2,150)
         self.ui.tableHistorialDetalleVentaSeleccionada.setColumnWidth(3,250)
@@ -557,7 +557,7 @@ class mywindow(QMainWindow):
 
         column_index = self.ui.tableVentasDiarias.columnCount() #Ultima columna para la cantidad de ventas 
         self.ui.tableVentasDiarias.setColumnCount(column_index + 1)
-        header_item = QTableWidgetItem("Cantidad de ventas")
+        header_item = QTableWidgetItem("Cantidad de llaveros")
         font = QFont("MS Shell Dlg 2", 11)
         font.setBold(True)
         header_item.setFont(font)
