@@ -23,8 +23,15 @@ def valida_rut(rut):
     rut = rut.replace("-","")
     dat=[rut[:-1],rut[-1]]
 
-    if dat[0].isdigit() and dat[1].isdigit():
-        dat[1] = int(dat[1])
+    if dat[0].isdigit():
+        if  dat[1].isdigit():
+            dat[1] = int(dat[1])
+        else:
+            if dat[1] == "k" or dat[1] == "K":
+                dat[1] = "k"
+                pass
+            else: 
+                return 0 #No valido
         if dat[1] == valida_digito_verificador(dat):
             return 1 #Valido
         else:
