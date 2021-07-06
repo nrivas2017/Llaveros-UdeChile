@@ -60,7 +60,10 @@ class mywindow(QMainWindow):
         ################### Pagina Historial #######################
         self.ui.comboBoxFiltroMes.addItem("Todos")
         for i in range(1,13):
-            self.ui.comboBoxFiltroMes.addItem(str(i))
+            if i < 10:
+                self.ui.comboBoxFiltroMes.addItem("0"+str(i))
+            else:
+                self.ui.comboBoxFiltroMes.addItem(str(i))
         self.ui.comboBoxFiltroMes.currentIndexChanged.connect(self.filtroMesHistorial)
         self.ui.lineEditFiltroNombreHistorial.textChanged.connect(self.filtroNombreHistorial)
         self.ui.lineEditFiltroRutHistorial.textChanged.connect(self.filtroRutHistorial)    
@@ -173,7 +176,6 @@ class mywindow(QMainWindow):
         else:
             mes = "-"+mes+"-"
         self.selectHistorial(mes,nombre,rut)
-
     def filtroNombreHistorial(self):
         nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
         rut = str(self.ui.lineEditFiltroRutHistorial.text())
@@ -203,7 +205,14 @@ class mywindow(QMainWindow):
         self.addItem()  #carga un item inicial
 
         today = date.today()#Día actual
-        fecha = str(today.day)+"-"+str(today.month)+"-"+str(today.year)
+        dia = str(today.day)
+        mes = str(today.month)
+        year = str(today.year)
+        if today.day < 10:
+            dia = "0"+str(today.day)
+        if today.month < 10:
+            mes = "0"+str(today.month)
+        fecha = dia+"-"+mes+"-"+year
         self.ui.tableCliente.setItem(0 , 0, QTableWidgetItem(fecha))
     def cambioHistorial(self):
 
@@ -502,9 +511,12 @@ class mywindow(QMainWindow):
         return
     
     def selectHome(self):
-        today = date.today()
+        today = date.today()#Día actual
+        
         mesActual = str(today.month)
         yearActual = str(today.year)
+        if today.month < 10:
+            mesActual = "0"+str(today.month)
 
         data = selectLlaveros()
         dineroMes = selectDineroTotalMes("-" + mesActual + "-")
@@ -562,7 +574,7 @@ class mywindow(QMainWindow):
         font.setBold(True)
         header_item.setFont(font)
         self.ui.tableVentasDiarias.setHorizontalHeaderItem(column_index, header_item)
-        self.ui.tableVentasDiarias.setColumnWidth(column_index,150)
+        self.ui.tableVentasDiarias.setColumnWidth(column_index,160)
 
         column_index = self.ui.tableVentasDiarias.columnCount() #Ultima columna para la cantidad de ventas 
         self.ui.tableVentasDiarias.setColumnCount(column_index + 1)
@@ -596,12 +608,18 @@ class mywindow(QMainWindow):
         for i in range(1,cantidadDeDias+1):
             rowPosition = self.ui.tableVentasDiarias.rowCount() #Agrega filas = cantidad de dias del mes
             self.ui.tableVentasDiarias.insertRow(rowPosition)
-            header_item = QTableWidgetItem(str(i)+"-"+str(mesActual)+"-"+str(yearActual))
+            if i < 10:
+                header_item = QTableWidgetItem("0"+str(i)+"-"+str(mesActual)+"-"+str(yearActual))
+            else:
+                header_item = QTableWidgetItem(str(i)+"-"+str(mesActual)+"-"+str(yearActual))
             font = QFont("MS Shell Dlg 2", 11)
             header_item.setFont(font)
             self.ui.tableVentasDiarias.setVerticalHeaderItem(rowPosition, header_item)
 
-            dataPorDia = selectVentasPorDia(str(i)+"-"+str(mesActual)+"-"+str(yearActual))
+            if i < 10:
+                dataPorDia = selectVentasPorDia("0"+str(i)+"-"+str(mesActual)+"-"+str(yearActual))
+            else:
+                dataPorDia = selectVentasPorDia(str(i)+"-"+str(mesActual)+"-"+str(yearActual))
             if dataPorDia[0] == 0:
                 self.dbError("Ha ocurrido un error al hacer una peticion en la BD")
                 return

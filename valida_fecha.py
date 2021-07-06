@@ -26,6 +26,16 @@ def validaFecha(fecha):
                     return False,0 #"El dia esta fuera de rango"
             else:
                 return False,0 #"El Mes esta fuera de rango"
-            return True,'{}-{}-{}'.format(diaRes, mesRes, anioRes)
+            if diaRes<10:
+                if mesRes<10:
+                    return True,'0{}-0{}-{}'.format(diaRes, mesRes, anioRes)
+                else:
+                    return True,'0{}-{}-{}'.format(diaRes, mesRes, anioRes)
+            else:
+                if mesRes<10:
+                    return True,'{}-0{}-{}'.format(diaRes, mesRes, anioRes)
+                else:
+                    return True,'{}-{}-{}'.format(diaRes, mesRes, anioRes)
+                
         else:
             return False,0 #"fecha incorrecta"
