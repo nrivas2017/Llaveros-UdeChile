@@ -53,50 +53,95 @@ def selectDetalleWhereID(id_venta,con = sql_connection()):
     except Error:
         return 0,Error
 
-def selectVentas(mes,nombre,rut,con = sql_connection()):
+def selectVentas(mes,year,nombre,rut,con = sql_connection()):
     try:
         if mes =="":
-            aData=[]
-            for i in range(12,0,-1):
-                if i < 10:
-                    mesAux = "-0"+str(i)+"-"
+            if year =="":
+                aData=[]
+                today = date.today()
+                yearActual = str(today.year)
+                for j in range(int(yearActual)+1,2019,-1):
+                    for i in range(12,0,-1):
+                        if i < 10:
+                            mesAux = "-0"+str(i)+"-"+str(j)
+                        else:
+                            mesAux = "-"+str(i)+"-"+str(j)
+                        cursorObj = con.cursor()
+                        cursorObj.execute("""SELECT id_venta,fecha,nom_cliente,rut_cliente,dir_cliente,tel_cliente,tipoEntrega,total,(select sum(cantidad) from detalle  WHERE id_venta == ve.id_venta) as cantidad from venta as ve WHERE ve.fecha LIKE '%"""+mesAux+"""%' AND ve.nom_cliente LIKE '"""+nombre+"""%' AND ve.rut_cliente LIKE '"""+rut+"""%' ORDER BY fecha DESC""")
+                        
+                        respuesta = cursorObj.fetchall()
+
+                        for fila in respuesta:
+                            aux={"id_venta":fila[0], "fecha":fila[1],"nom_cliente":fila[2],"rut_cliente":fila[3],"dir_cliente":fila[4],"tel_cliente":fila[5],"tipoEntrega":fila[6],"total":fila[7],"cantidad":fila[8]}
+                            aData.append(aux)
+                        con.commit()
+                        cursorObj.close()
+                return 1,aData
+            else:
+                aData=[]
+                for i in range(12,0,-1):
+                    if i < 10:
+                        mesAux = "-0"+str(i)+"-"+year
+                    else:
+                        mesAux = "-"+str(i)+"-"+year
+                    cursorObj = con.cursor()
+                    cursorObj.execute("""SELECT id_venta,fecha,nom_cliente,rut_cliente,dir_cliente,tel_cliente,tipoEntrega,total,(select sum(cantidad) from detalle  WHERE id_venta == ve.id_venta) as cantidad from venta as ve WHERE ve.fecha LIKE '%"""+mesAux+"""%' AND ve.nom_cliente LIKE '"""+nombre+"""%' AND ve.rut_cliente LIKE '"""+rut+"""%' ORDER BY fecha DESC""")
+                    
+                    respuesta = cursorObj.fetchall()
+
+                    for fila in respuesta:
+                        aux={"id_venta":fila[0], "fecha":fila[1],"nom_cliente":fila[2],"rut_cliente":fila[3],"dir_cliente":fila[4],"tel_cliente":fila[5],"tipoEntrega":fila[6],"total":fila[7],"cantidad":fila[8]}
+                        aData.append(aux)
+                    con.commit()
+                    cursorObj.close()
+                return 1,aData
+        else:
+            if year =="":
+                aData=[]
+                today = date.today()
+                yearActual = str(today.year)
+                for j in range(int(yearActual)+1,2019,-1):
+                    if int(mes)<10:
+                        mesAux = "-"+mes+"-"+str(j)
+                    else:
+                        mesAux = "-"+mes+"-"+str(j)
+                    cursorObj = con.cursor()
+                    cursorObj.execute("""SELECT id_venta,fecha,nom_cliente,rut_cliente,dir_cliente,tel_cliente,tipoEntrega,total,(select sum(cantidad) from detalle  WHERE id_venta == ve.id_venta) as cantidad from venta as ve WHERE ve.fecha LIKE '%"""+mesAux+"""%' AND ve.nom_cliente LIKE '"""+nombre+"""%' AND ve.rut_cliente LIKE '"""+rut+"""%' ORDER BY fecha DESC""")
+                    
+                    respuesta = cursorObj.fetchall()
+
+                    for fila in respuesta:
+                        aux={"id_venta":fila[0], "fecha":fila[1],"nom_cliente":fila[2],"rut_cliente":fila[3],"dir_cliente":fila[4],"tel_cliente":fila[5],"tipoEntrega":fila[6],"total":fila[7],"cantidad":fila[8]}
+                        aData.append(aux)
+                    con.commit()
+                    cursorObj.close()
+                return 1,aData
+            else:
+                if int(mes)<10:
+                    mesAux = "-"+mes+"-"+year
                 else:
-                    mesAux = "-"+str(i)+"-"
-                print (mesAux)
+                    mesAux = "-"+mes+"-"+year
                 cursorObj = con.cursor()
                 cursorObj.execute("""SELECT id_venta,fecha,nom_cliente,rut_cliente,dir_cliente,tel_cliente,tipoEntrega,total,(select sum(cantidad) from detalle  WHERE id_venta == ve.id_venta) as cantidad from venta as ve WHERE ve.fecha LIKE '%"""+mesAux+"""%' AND ve.nom_cliente LIKE '"""+nombre+"""%' AND ve.rut_cliente LIKE '"""+rut+"""%' ORDER BY fecha DESC""")
                 
                 respuesta = cursorObj.fetchall()
 
+                aData=[]
                 for fila in respuesta:
                     aux={"id_venta":fila[0], "fecha":fila[1],"nom_cliente":fila[2],"rut_cliente":fila[3],"dir_cliente":fila[4],"tel_cliente":fila[5],"tipoEntrega":fila[6],"total":fila[7],"cantidad":fila[8]}
                     aData.append(aux)
                 con.commit()
                 cursorObj.close()
-            for i in range (len(aData)):
-                print (aData[i]["fecha"])
-            return 1,aData
-        else:
-            cursorObj = con.cursor()
-            cursorObj.execute("""SELECT id_venta,fecha,nom_cliente,rut_cliente,dir_cliente,tel_cliente,tipoEntrega,total,(select sum(cantidad) from detalle  WHERE id_venta == ve.id_venta) as cantidad from venta as ve WHERE ve.fecha LIKE '%"""+mes+"""%' AND ve.nom_cliente LIKE '"""+nombre+"""%' AND ve.rut_cliente LIKE '"""+rut+"""%' ORDER BY fecha DESC""")
-            
-            respuesta = cursorObj.fetchall()
-
-            aData=[]
-            for fila in respuesta:
-                aux={"id_venta":fila[0], "fecha":fila[1],"nom_cliente":fila[2],"rut_cliente":fila[3],"dir_cliente":fila[4],"tel_cliente":fila[5],"tipoEntrega":fila[6],"total":fila[7],"cantidad":fila[8]}
-                aData.append(aux)
-            con.commit()
-            cursorObj.close()
-            return 1,aData
+                return 1,aData
     except Error:
         return 0,Error
 
 def selectDineroTotalMes(mes,con = sql_connection()):
     try:
+        if "--" in mes:
+            mes = "-"+mes.replace("-","")
         cursorObj = con.cursor()
         cursorObj.execute("""SELECT sum(total) as total_mes from venta WHERE fecha LIKE '%"""+mes+"""%'""")
-        
         respuesta = cursorObj.fetchall()
 
         aData=[]
@@ -111,9 +156,10 @@ def selectDineroTotalMes(mes,con = sql_connection()):
 
 def selectCantidadTotalMes(mes,con = sql_connection()):
     try:
+        if "--" in mes:
+            mes = "-"+mes.replace("-","")
         cursorObj = con.cursor()
         cursorObj.execute("""SELECT sum(de.cantidad) as cantidad_total FROM venta as ve INNER JOIN detalle as de WHERE ve.id_venta = de.id_venta AND ve.fecha LIKE '%"""+mes+"""%'""")
-        
         respuesta = cursorObj.fetchall()
 
         aData=[]

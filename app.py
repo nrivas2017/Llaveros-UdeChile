@@ -64,7 +64,13 @@ class mywindow(QMainWindow):
                 self.ui.comboBoxFiltroMes.addItem("0"+str(i))
             else:
                 self.ui.comboBoxFiltroMes.addItem(str(i))
+        today = date.today()
+        year = today.year
+        self.ui.comboBoxFiltroYear.addItem("Todos")
+        for i in range((year-2020)+1):
+            self.ui.comboBoxFiltroYear.addItem(str(int(2020+i)))
         self.ui.comboBoxFiltroMes.currentIndexChanged.connect(self.filtroMesHistorial)
+        self.ui.comboBoxFiltroYear.currentIndexChanged.connect(self.filtroYearHistorial)
         self.ui.lineEditFiltroNombreHistorial.textChanged.connect(self.filtroNombreHistorial)
         self.ui.lineEditFiltroRutHistorial.textChanged.connect(self.filtroRutHistorial)    
 
@@ -171,29 +177,42 @@ class mywindow(QMainWindow):
         nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
         rut = str(self.ui.lineEditFiltroRutHistorial.text())
         mes = str(self.ui.comboBoxFiltroMes.currentText())
+        year = str(self.ui.comboBoxFiltroYear.currentText())
         if mes == "Todos":
             mes = ""
-        else:
-            mes = "-"+mes+"-"
-        self.selectHistorial(mes,nombre,rut)
+        if year == "Todos":
+            year = ""
+        self.selectHistorial(mes,year,nombre,rut)
+    def filtroYearHistorial(self):
+        nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
+        rut = str(self.ui.lineEditFiltroRutHistorial.text())
+        mes = str(self.ui.comboBoxFiltroMes.currentText())
+        year = str(self.ui.comboBoxFiltroYear.currentText())
+        if mes == "Todos":
+            mes = ""
+        if year == "Todos":
+            year = ""
+        self.selectHistorial(mes,year,nombre,rut)
     def filtroNombreHistorial(self):
         nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
         rut = str(self.ui.lineEditFiltroRutHistorial.text())
         mes = str(self.ui.comboBoxFiltroMes.currentText())
+        year = str(self.ui.comboBoxFiltroYear.currentText())
         if mes == "Todos":
             mes = ""
-        else:
-            mes = "-"+mes+"-"
-        self.selectHistorial(mes,nombre,rut)
+        if year == "Todos":
+            year = ""
+        self.selectHistorial(mes,year,nombre,rut)
     def filtroRutHistorial(self):
         nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
         rut = str(self.ui.lineEditFiltroRutHistorial.text())
         mes = str(self.ui.comboBoxFiltroMes.currentText())
+        year = str(self.ui.comboBoxFiltroYear.currentText())
         if mes == "Todos":
             mes = ""
-        else:
-            mes = "-"+mes+"-"
-        self.selectHistorial(mes,nombre,rut)
+        if year == "Todos":
+            year = ""
+        self.selectHistorial(mes,year,nombre,rut)
 
     def cambioHome(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.home_page) #Carga pagina
@@ -215,22 +234,23 @@ class mywindow(QMainWindow):
         fecha = dia+"-"+mes+"-"+year
         self.ui.tableCliente.setItem(0 , 0, QTableWidgetItem(fecha))
     def cambioHistorial(self):
-
-        
         today = date.today()
         mesActual = str(today.month)
+        yearActual = str(today.year)
         self.ui.comboBoxFiltroMes.setCurrentIndex(int(mesActual))
+        self.ui.comboBoxFiltroYear.setCurrentIndex(int(yearActual)-2020+1)
 
         self.ui.stackedWidget.setCurrentWidget(self.ui.historial_page) #Carga pagina
         nombre = str(self.ui.lineEditFiltroNombreHistorial.text())
         rut = str(self.ui.lineEditFiltroRutHistorial.text())
         mes = str(self.ui.comboBoxFiltroMes.currentText())
+        year = str(self.ui.comboBoxFiltroYear.currentText())
 
         if mes == "Todos":
             mes = ""
-        else:
-            mes = "-"+mes+"-"
-        self.selectHistorial(mes,nombre,rut) #Carga tabla historial
+        if year == "Todos":
+            year = ""
+        self.selectHistorial(mes,year,nombre,rut)
     def cambioStock(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.stock_page)  #carga pagina
         self.selectStock()  #carga tabla stock
@@ -519,8 +539,8 @@ class mywindow(QMainWindow):
             mesActual = "0"+str(today.month)
 
         data = selectLlaveros()
-        dineroMes = selectDineroTotalMes("-" + mesActual + "-")
-        cantidadMes = selectCantidadTotalMes("-" + mesActual + "-")
+        dineroMes = selectDineroTotalMes("-" + mesActual + "-" + yearActual)
+        cantidadMes = selectCantidadTotalMes("-" + mesActual + "-" + yearActual)
 
         if data[0] == 0 or dineroMes[0] == 0 or cantidadMes[0] == 0:
             self.dbError("Ha ocurrido un error al hacer una peticion en la BD")
@@ -685,12 +705,12 @@ class mywindow(QMainWindow):
         i = self.ui.comboBoxLlaveroStock[row].currentIndex()
         self.ui.tableActualizaStock.setItem(row , 1, QTableWidgetItem(str(data[i]["precio"])))
 
-    def selectHistorial(self,mes,nombre,rut):
+    def selectHistorial(self,mes,year,nombre,rut):
 
-        dineroMes = selectDineroTotalMes(mes)
-        cantidadMes = selectCantidadTotalMes(mes)            
+        dineroMes = selectDineroTotalMes("-" + mes + "-" + year)
+        cantidadMes = selectCantidadTotalMes("-" + mes + "-" + year)         
         
-        data = selectVentas(mes,nombre,rut)
+        data = selectVentas(mes,year,nombre,rut)
         if data[0] == 0 or dineroMes[0] == 0 or cantidadMes[0] == 0:
             self.dbError("Ha ocurrido un error al hacer una peticion en la BD")
             return
